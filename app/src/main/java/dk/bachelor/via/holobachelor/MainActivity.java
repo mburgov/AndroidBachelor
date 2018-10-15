@@ -1,44 +1,52 @@
 package dk.bachelor.via.holobachelor;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     BluetoothAdapter mBAdapter;
     BluetoothManager mBManager;
     BluetoothLeAdvertiser mBLEAdvertiser;
     static final int BEACON_ID = 1775;
+    AdvertiseData data;
+    private GestureDetector mDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // this is the view we will add the gesture detector to
+        View myView = findViewById(R.id.gesture_view);
+
+        // get the gesture detector
+        mDetector = new GestureDetector(this, new MyGestureListener());
+
+        // Add a touch listener to the view
+        // The touch listener passes all its events on to the gesture detector
+        myView.setOnTouchListener(touchListener);
         mBManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        mBAdapter = mBManager.getAdapter();
+        if (mBManager != null) {
+            mBAdapter = mBManager.getAdapter();
+        }
         mBLEAdvertiser = mBAdapter.getBluetoothLeAdvertiser();
     }
 
@@ -49,17 +57,14 @@ public class MainActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivity(enableBtIntent);
             finish();
-            return;
         }
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "No LE support on this device", Toast.LENGTH_SHORT).show();
             finish();
-            return;
         }
         if (!mBAdapter.isMultipleAdvertisementSupported()) {
             Toast.makeText(this, "No advertising support on this device", Toast.LENGTH_SHORT).show();
             finish();
-            return;
         }
     }
 
@@ -69,16 +74,14 @@ public class MainActivity extends AppCompatActivity {
         stopAdvertising();
     }
 
+    // BLE Code
     private void startAdvertising() {
         if (mBLEAdvertiser == null) return;
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
                 .setConnectable(false)
-                .setTimeout(0)
+                .setTimeout(800)
                 .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
-                .build();
-        AdvertiseData data = new AdvertiseData.Builder()
-                .addManufacturerData(BEACON_ID, buildGPSPacket())
                 .build();
         mBLEAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
     }
@@ -86,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
     private void stopAdvertising() {
         if (mBLEAdvertiser == null) return;
         mBLEAdvertiser.stopAdvertising(mAdvertiseCallback);
+        String msg = "Service Stopped";
+        TextView tv1 = (TextView)findViewById(R.id.textView);
+        tv1.setText(msg);
     }
 
     private void restartAdvertising() {
@@ -123,14 +129,81 @@ UI feedback to the user would go here.
         }
     };
 
-    private byte[] buildGPSPacket() {
+    private byte[] buildGPSPacket(byte payload) {
         byte[] packet = new byte[1];
-        packet[0] = 1;
-        /* GPS code packet generation goes here */
+        packet[0] = payload;
         return packet;
     }
 
-    public void buttonPress(View view){
+    private void createPacketWithData(byte payload) {
+        data = new AdvertiseData.Builder()
+                .addManufacturerData(BEACON_ID, buildGPSPacket(payload))
+                .build();
         startAdvertising();
     }
+
+    public void buttonPress(View view){
+        createPacketWithData((byte) 1);
+    }
+
+    public void buttonPress2(View view){
+        createPacketWithData((byte) 2);
+    }
+
+    // Gesture Control
+    View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            // pass the events to the gesture detector
+            // a return value of true means the detector is handling it
+            // a return value of false means the detector didn't
+            // recognize the event
+            return mDetector.onTouchEvent(event);
+
+        }
+    };
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d("TAG","onDown: ");
+
+            // don't return false here or else none of the other
+            // gestures will work
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            Log.i("TAG", "onSingleTapConfirmed: ");
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.i("TAG", "onLongPress: ");
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            Log.i("TAG", "onDoubleTap: ");
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                float distanceX, float distanceY) {
+            Log.i("TAG", "onScroll: ");
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d("TAG", "onFling: ");
+            return true;
+        }
+    }
+
 }
