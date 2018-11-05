@@ -2,15 +2,10 @@ package dk.bachelor.via.holobachelor;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
-import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Debug;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,8 +13,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import Broadcaster.Broadcaster;
 
 import static java.lang.Thread.sleep;
 
@@ -30,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
     BluetoothLeAdvertiser mBLEAdvertiser;
     static final int BEACON_ID = 1775;
     AdvertiseData data;
+    Broadcaster broadcaster;
     private GestureDetector mDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotationGestureDetector mRotationDetector;
@@ -59,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
             mBAdapter = mBManager.getAdapter();
         }
         mBLEAdvertiser = mBAdapter.getBluetoothLeAdvertiser();
+        broadcaster = new Broadcaster(mBManager, mBAdapter, mBLEAdvertiser);
+
     }
 
     @Override
@@ -82,93 +81,15 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
     @Override
     protected void onPause() {
         super.onPause();
-        stopAdvertising();
-    }
-
-    // BLE Code
-    private void startAdvertising() {
-        if (mBLEAdvertiser == null) return;
-        AdvertiseSettings settings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-                .setConnectable(false)
-                .setTimeout(800)
-                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
-                .build();
-        mBLEAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
-        try {
-            sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void stopAdvertising() {
-        if (mBLEAdvertiser == null) return;
-        mBLEAdvertiser.stopAdvertising(mAdvertiseCallback);
-        String msg = "Service Stopped";
-        TextView tv1 = (TextView)findViewById(R.id.textView);
-        tv1.setText(msg);
-    }
-
-    private void restartAdvertising() {
-        stopAdvertising();
-        startAdvertising();
-    }
-
-    private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
-        @Override
-        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-            super.onStartSuccess(settingsInEffect);
-            String msg = "Service Running";
-            TextView tv1 = (TextView)findViewById(R.id.textView);
-            tv1.setText(msg);
-            mHandler.sendMessage(Message.obtain(null, 0, msg));
-        }
-
-        @Override
-        public void onStartFailure(int errorCode) {
-            if (errorCode != ADVERTISE_FAILED_ALREADY_STARTED) {
-                String msg = "Service failed to start: " + errorCode;
-                mHandler.sendMessage(Message.obtain(null, 0, msg));
-            } else {
-                restartAdvertising();
-            }
-        }
-    };
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-/*
-UI feedback to the user would go here.
-*/
-        }
-    };
-
-    private byte[] buildGPSPacket(byte id, byte payload) {
-        byte[] packet = new byte[2];
-        packet[0] = id;
-        packet[1] = payload;
-        return packet;
-    }
-
-    // IDs:
-    // 1 - Panning
-    // 2 - Zooming
-    // 3 - Rotating
-    private void createPacketWithData(byte id, byte payload) {
-        data = new AdvertiseData.Builder()
-                .addManufacturerData(BEACON_ID, buildGPSPacket(id, payload))
-                .build();
-        startAdvertising();
+        broadcaster.stopAdvertising();
     }
 
     public void buttonPress(View view){
-        createPacketWithData((byte) 1, (byte)1);
+        broadcaster.createPacketWithData((byte) 1, (byte)1);
     }
 
     public void buttonPress2(View view){
-        createPacketWithData((byte) 1, (byte) 2);
+        broadcaster.createPacketWithData((byte) 1, (byte) 2);
     }
 
     // Gesture Control
@@ -189,11 +110,11 @@ UI feedback to the user would go here.
             // payload: 1 for positive, 0 for negative rotation
             // positive rotation is counter clockwise
             if(angle > 25) {
-                createPacketWithData((byte) 3, (byte) 1);
+                broadcaster.createPacketWithData((byte) 3, (byte) 1);
                 Log.d("RotationGestureDetector", "Positive Rotation");
             }
             else if(angle < -25) {
-                createPacketWithData((byte) 3, (byte) 0);
+                broadcaster.createPacketWithData((byte) 3, (byte) 0);
                 Log.d("RotationGestureDetector", "Negative Rotation");
             }
         }
@@ -225,12 +146,12 @@ UI feedback to the user would go here.
 
             if(mScaleFactor > originalValue && Math.abs(angle) < 25) {
                 // 1 for zoom in
-                createPacketWithData((byte) 2, (byte) 1);
+                broadcaster.createPacketWithData((byte) 2, (byte) 1);
                 Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
                 Log.d("Scale", "Zoomed in");
             } else if (mScaleFactor < originalValue && Math.abs(angle) < 25){
                 // 0 for zoom out
-                createPacketWithData((byte) 2, (byte) 0);
+                broadcaster.createPacketWithData((byte) 2, (byte) 0);
                 Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
                 Log.d("Scale", "Zoomed out");
             }
@@ -250,19 +171,6 @@ UI feedback to the user would go here.
     public void OnRotation(RotationGestureDetector rotationDetector) {
         angle = rotationDetector.getAngle();
          Log.d("RotationGestureDetector", "Rotation: " + Float.toString(angle));
-        // payload: 1 for positive, 0 for negative rotation
-        // positive rotation is counter clockwise
-        /*
-        if(angle > 0 && !screenIsTouched) {
-            createPacketWithData((byte) 3, (byte) 1);
-            Log.d("RotationGestureDetector", "Positive Rotation");
-        }
-        else if(angle < 0 && !screenIsTouched) {
-            createPacketWithData((byte) 3, (byte) 0);
-            Log.d("RotationGestureDetector", "Negative Rotation");
-        }*/
-
-
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {

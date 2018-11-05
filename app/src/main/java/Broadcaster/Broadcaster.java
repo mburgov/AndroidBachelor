@@ -1,0 +1,100 @@
+package Broadcaster;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.AdvertiseCallback;
+import android.bluetooth.le.AdvertiseData;
+import android.bluetooth.le.AdvertiseSettings;
+import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.os.Handler;
+import android.os.Message;
+
+import static java.lang.Thread.sleep;
+
+public class Broadcaster {
+
+    BluetoothAdapter mBAdapter;
+    BluetoothManager mBManager;
+    BluetoothLeAdvertiser mBLEAdvertiser;
+    static final int BEACON_ID = 1775;
+    AdvertiseData data;
+
+    public Broadcaster(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser){
+        this.mBManager = manager;
+        this.mBAdapter = mBAdapter;
+        this.mBLEAdvertiser = mBLEAdvertiser;
+    }
+
+    private void startAdvertising() {
+        if (mBLEAdvertiser == null) return;
+        AdvertiseSettings settings = new AdvertiseSettings.Builder()
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+                .setConnectable(false)
+                .setTimeout(800)
+                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
+                .build();
+        mBLEAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
+        try {
+            sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopAdvertising() {
+        if (mBLEAdvertiser == null) return;
+        mBLEAdvertiser.stopAdvertising(mAdvertiseCallback);
+        String msg = "Service Stopped";
+    }
+
+    private void restartAdvertising() {
+        stopAdvertising();
+        startAdvertising();
+    }
+
+    private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
+        @Override
+        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+            super.onStartSuccess(settingsInEffect);
+            String msg = "Service Running";
+            mHandler.sendMessage(Message.obtain(null, 0, msg));
+        }
+
+        @Override
+        public void onStartFailure(int errorCode) {
+            if (errorCode != ADVERTISE_FAILED_ALREADY_STARTED) {
+                String msg = "Service failed to start: " + errorCode;
+                mHandler.sendMessage(Message.obtain(null, 0, msg));
+            } else {
+                restartAdvertising();
+            }
+        }
+    };
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+/*
+UI feedback to the user would go here.
+*/
+        }
+    };
+
+    private byte[] buildGPSPacket(byte id, byte payload) {
+        byte[] packet = new byte[2];
+        packet[0] = id;
+        packet[1] = payload;
+        return packet;
+    }
+
+    // IDs:
+    // 1 - Panning
+    // 2 - Zooming
+    // 3 - Rotating
+    public void createPacketWithData(byte id, byte payload) {
+        data = new AdvertiseData.Builder()
+                .addManufacturerData(BEACON_ID, buildGPSPacket(id, payload))
+                .build();
+        startAdvertising();
+    }
+}
