@@ -80,7 +80,7 @@ UI feedback to the user would go here.
         }
     };
 
-    private byte[] buildGPSPacket(byte id, byte payload) {
+    private byte[] buildBLEPacket(byte id, byte payload) {
         byte[] packet = new byte[2];
         packet[0] = id;
         packet[1] = payload;
@@ -93,7 +93,7 @@ UI feedback to the user would go here.
     // 3 - Rotating
     public void createPacketWithData(byte id, byte payload) {
         data = new AdvertiseData.Builder()
-                .addManufacturerData(BEACON_ID, buildGPSPacket(id, payload))
+                .addManufacturerData(BEACON_ID, buildBLEPacket(id, payload))
                 .build();
         startAdvertising();
     }
