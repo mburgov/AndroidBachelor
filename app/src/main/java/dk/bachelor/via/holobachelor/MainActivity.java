@@ -84,12 +84,15 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
         broadcaster.stopAdvertising();
     }
 
-    public void buttonPress(View view){
-        broadcaster.createPacketWithData((byte) 1, (byte)1);
-    }
-
-    public void buttonPress2(View view){
-        broadcaster.createPacketWithData((byte) 1, (byte) 2);
+    public void panMap(View view){
+        /* first argument is the movement type
+        second is the direction of panning, going CSS style
+        1 - North
+        2 - East
+        3 - South
+        4 - West
+         */
+        broadcaster.createPacketWithData((byte) 1, Byte.parseByte(view.getTag().toString()));
     }
 
     // Gesture Control

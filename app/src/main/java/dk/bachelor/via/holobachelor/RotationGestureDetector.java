@@ -73,7 +73,7 @@ public class RotationGestureDetector {
         return angle;
     }
 
-    public static interface OnRotationGestureListener {
+    public interface OnRotationGestureListener {
         public void OnRotation(RotationGestureDetector rotationDetector);
     }
 }
