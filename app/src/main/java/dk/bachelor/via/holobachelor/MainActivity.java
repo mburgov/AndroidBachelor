@@ -6,10 +6,14 @@ import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -33,12 +37,39 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
     private float mScaleFactor = 1.0f;
     private boolean screenIsTouched = false;
     private float angle = 0.0f;
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                                                           @Override
+                                                           public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                                                               switch (item.getItemId()){
+                                                                   case R.id.navigation_navigation:
+
+                                                                       break;
+
+                                                                   case R.id.navigation_settings:
+                                                                       Intent intent1 = new Intent(MainActivity.this, SettingsActivity.class);
+                                                                       startActivity(intent1);
+                                                                       break;
+                                                               }
+
+
+                                                               return false;
+                                                           }
+        });
+
+                navigation.getMenu().findItem(R.id.navigation_navigation).setChecked(true);
+
+        Menu menu = navigation.getMenu();
+        MenuItem menuItem = menu.getItem(1);
+        menuItem.setChecked(true);
 
         // this is the view we will add the gesture detector to
         View myView = findViewById(R.id.gesture_view);
