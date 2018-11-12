@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 
 import Broadcaster.Broadcaster;
 
-public class NavigationFragment extends Fragment implements RotationGestureDetector.OnRotationGestureListener  {
+public class NavigationFragment extends Fragment implements RotationGestureDetector.onRotationGestureListener  {
 
     private GestureDetector mDetector;
     private ScaleGestureDetector mScaleGestureDetector;
@@ -160,7 +160,7 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
 
 
     @Override
-    public void OnRotation(RotationGestureDetector rotationDetector) {
+    public void onRotation(RotationGestureDetector rotationDetector) {
         angle = rotationDetector.getAngle();
         Log.d("RotationGestureDetector", "Rotation: " + Float.toString(angle));
     }

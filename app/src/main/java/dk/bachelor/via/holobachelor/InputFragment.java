@@ -23,7 +23,7 @@ public class InputFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
 
-        View view = inflater.inflate(R.layout.navigation_fragment, container, false);
+        View view = inflater.inflate(R.layout.input_fragment, container, false);
         broadcaster = MainActivity.broadcaster;
 
         return view;
