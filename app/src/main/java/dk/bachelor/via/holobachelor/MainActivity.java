@@ -24,7 +24,7 @@ import Broadcaster.Broadcaster;
 import static java.lang.Thread.sleep;
 
 
-public class MainActivity extends AppCompatActivity implements RotationGestureDetector.OnRotationGestureListener {
+public class MainActivity extends AppCompatActivity implements RotationGestureDetector.onRotationGestureListener {
     BluetoothAdapter mBAdapter;
     BluetoothManager mBManager;
     BluetoothLeAdvertiser mBLEAdvertiser;
@@ -159,19 +159,20 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
 
         private float originalValue = 128;
 
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector){
+            Log.d("Scale", "It started");
+            mScaleFactor = originalValue;
+            return true;
+        }
+
         @Override
         public boolean onScale(ScaleGestureDetector scaleGestureDetector){
             mScaleFactor *= scaleGestureDetector.getScaleFactor();
             mScaleFactor = Math.max(1.0f,
                     Math.min(mScaleFactor, 256.0f));
             Log.d("TAG", "Scale factor: " + Float.toString(mScaleFactor));
-            return true;
-        }
-
-        @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector){
-            Log.d("Scale", "It started");
-            mScaleFactor = originalValue;
             return true;
         }
 
@@ -202,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
     };
 
     @Override
-    public void OnRotation(RotationGestureDetector rotationDetector) {
+    public void onRotation(RotationGestureDetector rotationDetector) {
         angle = rotationDetector.getAngle();
          Log.d("RotationGestureDetector", "Rotation: " + Float.toString(angle));
     }

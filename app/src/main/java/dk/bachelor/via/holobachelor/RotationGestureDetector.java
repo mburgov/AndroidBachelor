@@ -1,6 +1,5 @@
 package dk.bachelor.via.holobachelor;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 public class RotationGestureDetector {
@@ -9,13 +8,13 @@ public class RotationGestureDetector {
     private int ptrID1, ptrID2;
     private float mAngle;
 
-    private OnRotationGestureListener mListener;
+    private onRotationGestureListener mListener;
 
     public float getAngle() {
         return mAngle;
     }
 
-    public RotationGestureDetector(OnRotationGestureListener listener){
+    public RotationGestureDetector(onRotationGestureListener listener){
         mListener = listener;
         ptrID1 = INVALID_POINTER_ID;
         ptrID2 = INVALID_POINTER_ID;
@@ -44,7 +43,7 @@ public class RotationGestureDetector {
                     mAngle = angleBetweenLines(fX, fY, sX, sY, nfX, nfY, nsX, nsY);
 
                     if (mListener != null) {
-                        mListener.OnRotation(this);
+                        mListener.onRotation(this);
                     }
                 }
                 break;
@@ -73,7 +72,7 @@ public class RotationGestureDetector {
         return angle;
     }
 
-    public interface OnRotationGestureListener {
-        public void OnRotation(RotationGestureDetector rotationDetector);
+    public interface onRotationGestureListener {
+        void onRotation(RotationGestureDetector rotationDetector);
     }
 }
