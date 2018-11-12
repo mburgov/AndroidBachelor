@@ -33,13 +33,6 @@ public class MainActivity extends AppCompatActivity{
     AdvertiseData data;
     public static Broadcaster broadcaster;
 
-    public Broadcaster getBroadcaster() {
-        return broadcaster;
-    }
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -57,6 +50,11 @@ public class MainActivity extends AppCompatActivity{
                                                                        break;
 
                                                                    case R.id.navigation_settings:
+                                                                       selectedFragment = new SettingsFragment();
+                                                                       break;
+
+                                                                   case R.id.navigation_input:
+                                                                       selectedFragment = new InputFragment();
                                                                        break;
                                                                }
                                                                getSupportFragmentManager().beginTransaction().replace(R.id.frame, selectedFragment).commit();
@@ -65,17 +63,16 @@ public class MainActivity extends AppCompatActivity{
                                                            }
         });
 
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame, new NavigationFragment()).commit();
 
 
-                navigation.getMenu().findItem(R.id.navigation_navigation).setChecked(true);
+        navigation.getMenu().findItem(R.id.navigation_navigation).setChecked(true);
 
         Menu menu = navigation.getMenu();
         MenuItem menuItem = menu.getItem(1);
         menuItem.setChecked(true);
 
         // this is the view we will add the gesture detector to
-        View myView = findViewById(R.id.gesture_view);
-
 
         // Add a touch listener to the view
         // The touch listener passes all its events on to the gesture detector
@@ -123,7 +120,4 @@ public class MainActivity extends AppCompatActivity{
          */
         broadcaster.createPacketWithData((byte) 1, Byte.parseByte(view.getTag().toString()));
     }
-
-    // Gesture Control
-
 }
