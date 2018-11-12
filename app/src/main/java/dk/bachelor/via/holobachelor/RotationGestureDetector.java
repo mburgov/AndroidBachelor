@@ -75,5 +75,6 @@ public class RotationGestureDetector {
 
     public interface OnRotationGestureListener {
         public void OnRotation(RotationGestureDetector rotationDetector);
+
     }
 }
