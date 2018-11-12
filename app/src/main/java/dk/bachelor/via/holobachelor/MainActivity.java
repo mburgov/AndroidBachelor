@@ -58,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements RotationGestureDe
                                                                        Intent intent1 = new Intent(MainActivity.this, SettingsActivity.class);
                                                                        startActivity(intent1);
                                                                        break;
+                                                                   case R.id.navigation_input:
+                                                                       Intent intent2=new Intent(MainActivity.this,InputActivity.class);
+                                                                       startActivity(intent2);
                                                                }
 
 
