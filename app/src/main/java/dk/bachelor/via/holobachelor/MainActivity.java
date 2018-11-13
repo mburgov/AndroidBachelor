@@ -112,6 +112,11 @@ public class MainActivity extends AppCompatActivity{
         3 - South
         4 - West
          */
-        broadcaster.createPacketWithData((byte) 1, Byte.parseByte(view.getTag().toString()));
+        byte[] data = {Byte.parseByte(view.getTag().toString())};
+        broadcaster.createPacketWithData((byte) 1, data);
+    }
+
+    public void passUserInput(byte type, byte[] info){
+        broadcaster.createPacketWithData(type, info);
     }
 }

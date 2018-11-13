@@ -3,9 +3,12 @@ package dk.bachelor.via.holobachelor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import Broadcaster.Broadcaster;
 
@@ -21,7 +24,22 @@ public class InputFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.input_fragment, container, false);
         broadcaster = MainActivity.broadcaster;
-
+        Button button = (Button) view.findViewById(R.id.button3);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                sendTextInput();
+            }
+        });
         return view;
+    }
+
+    private void sendTextInput(){
+        EditText input = getActivity().findViewById(R.id.editText);
+
+        //Log.d("MyText", input.getText().toString());
+        ((MainActivity)getActivity()).passUserInput((byte) 3, input.getText().toString().getBytes());
     }
 }

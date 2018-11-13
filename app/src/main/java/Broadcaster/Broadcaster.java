@@ -8,6 +8,9 @@ import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+
+import java.util.Arrays;
 
 import static java.lang.Thread.sleep;
 
@@ -90,10 +93,11 @@ UI feedback to the user would go here.
         }
     };
 
-    private byte[] buildBLEPacket(byte id, byte payload) {
-        byte[] packet = new byte[2];
+    private byte[] buildBLEPacket(byte id, byte[] payload) {
+        byte[] packet = new byte[payload.length + 1];
         packet[0] = id;
-        packet[1] = payload;
+        System.arraycopy(payload, 0, packet, 1, payload.length);
+        Log.d("Packet to be sent", Arrays.toString(packet));
         return packet;
     }
 
@@ -101,7 +105,7 @@ UI feedback to the user would go here.
     // 1 - Panning
     // 2 - Zooming
     // 3 - Rotating
-    public void createPacketWithData(byte id, byte payload) {
+    public void createPacketWithData(byte id, byte[] payload) {
         data = new AdvertiseData.Builder()
                 .addManufacturerData(BEACON_ID, buildBLEPacket(id, payload))
                 .build();

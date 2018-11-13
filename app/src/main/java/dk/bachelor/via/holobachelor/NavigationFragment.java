@@ -28,7 +28,6 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
     private boolean screenIsTouched = false;
     private float angle = 0.0f;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener;
-    private Broadcaster broadcaster;
 
     @Nullable
     @Override
@@ -40,7 +39,6 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
         View myView = view.findViewById(R.id.gesture_view);
         mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
         mRotationDetector = new RotationGestureDetector(this);
-        broadcaster = MainActivity.broadcaster;
         // get the gesture detector
         mDetector = new GestureDetector(getActivity(), new GestureDetector.OnGestureListener() {
             @Override
@@ -107,11 +105,11 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
                 // payload: 1 for positive, 0 for negative rotation
                 // positive rotation is counter clockwise
                 if(angle > 25) {
-                    broadcaster.createPacketWithData((byte) 3, (byte) 1);
+                    ((MainActivity)getActivity()).passUserInput((byte) 3, new byte[]{1});
                     Log.d("RotationGestureDetector", "Positive Rotation");
                 }
                 else if(angle < -25) {
-                    broadcaster.createPacketWithData((byte) 3, (byte) 0);
+                    ((MainActivity)getActivity()).passUserInput((byte) 3, new byte[]{0});
                     Log.d("RotationGestureDetector", "Negative Rotation");
                 }
             }
@@ -145,12 +143,12 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
 
             if(mScaleFactor > originalValue && Math.abs(angle) < 25) {
                 // 1 for zoom in
-                broadcaster.createPacketWithData((byte) 2, (byte) 1);
+                ((MainActivity)getActivity()).passUserInput((byte) 2, new byte[]{1});
                 Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
                 Log.d("Scale", "Zoomed in");
             } else if (mScaleFactor < originalValue && Math.abs(angle) < 25){
                 // 0 for zoom out
-                broadcaster.createPacketWithData((byte) 2, (byte) 0);
+                ((MainActivity)getActivity()).passUserInput((byte) 2, new byte[]{0});
                 Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
                 Log.d("Scale", "Zoomed out");
             }
