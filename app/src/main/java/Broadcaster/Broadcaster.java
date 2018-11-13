@@ -13,16 +13,26 @@ import static java.lang.Thread.sleep;
 
 public class Broadcaster {
 
+    private static Broadcaster INSTANCE = null;
     BluetoothAdapter mBAdapter;
     BluetoothManager mBManager;
     BluetoothLeAdvertiser mBLEAdvertiser;
     static final int BEACON_ID = 1775;
     AdvertiseData data;
 
-    public Broadcaster(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser){
+    private Broadcaster(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser){
         this.mBManager = manager;
         this.mBAdapter = mBAdapter;
         this.mBLEAdvertiser = mBLEAdvertiser;
+    }
+
+    public static Broadcaster getInstance(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser) {
+
+        if(INSTANCE == null){
+            INSTANCE = new Broadcaster(manager, mBAdapter, mBLEAdvertiser);
+        }
+        return INSTANCE;
+
     }
 
     private void startAdvertising() {

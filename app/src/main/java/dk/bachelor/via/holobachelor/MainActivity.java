@@ -11,25 +11,19 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
 
 import Broadcaster.Broadcaster;
 
-import static java.lang.Thread.sleep;
 
 
 public class MainActivity extends AppCompatActivity{
     BluetoothAdapter mBAdapter;
     BluetoothManager mBManager;
     BluetoothLeAdvertiser mBLEAdvertiser;
-    static final int BEACON_ID = 1775;
     AdvertiseData data;
     public static Broadcaster broadcaster;
 
@@ -39,7 +33,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                                                            @Override
                                                            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -82,7 +76,7 @@ public class MainActivity extends AppCompatActivity{
             mBAdapter = mBManager.getAdapter();
         }
         mBLEAdvertiser = mBAdapter.getBluetoothLeAdvertiser();
-        broadcaster = new Broadcaster(mBManager, mBAdapter, mBLEAdvertiser);
+        broadcaster = Broadcaster.getInstance(mBManager, mBAdapter, mBLEAdvertiser);
 
     }
 
