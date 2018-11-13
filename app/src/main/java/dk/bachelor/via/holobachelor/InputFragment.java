@@ -10,12 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import Broadcaster.Broadcaster;
-
 public class InputFragment extends Fragment {
-
-
-    public static Broadcaster broadcaster;
 
     @Nullable
     @Override
@@ -23,8 +18,7 @@ public class InputFragment extends Fragment {
 
 
         View view = inflater.inflate(R.layout.input_fragment, container, false);
-        broadcaster = MainActivity.broadcaster;
-        Button button = (Button) view.findViewById(R.id.button3);
+        Button button = view.findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override
