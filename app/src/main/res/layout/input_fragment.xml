@@ -14,11 +14,13 @@
         android:layout_marginTop="17dp"
         android:ems="10"
         android:inputType="text|textCapSentences"
-        android:text="Type something here"
+        android:hint="Type something here"
         app:layout_constraintBottom_toTopOf="@+id/button3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:maxLength="36"
+        /><!-- Max length is 36 due to BLE advertisement packet limit -->
 
     <Button
         android:id="@+id/button3"

@@ -105,6 +105,7 @@ UI feedback to the user would go here.
     // 1 - Panning
     // 2 - Zooming
     // 3 - Rotating
+    // 4 - Text input
     public void createPacketWithData(byte id, byte[] payload) {
         data = new AdvertiseData.Builder()
                 .addManufacturerData(BEACON_ID, buildBLEPacket(id, payload))

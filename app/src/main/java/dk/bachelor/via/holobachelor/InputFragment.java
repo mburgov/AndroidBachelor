@@ -38,8 +38,7 @@ public class InputFragment extends Fragment {
 
     private void sendTextInput(){
         EditText input = getActivity().findViewById(R.id.editText);
-
-        //Log.d("MyText", input.getText().toString());
-        ((MainActivity)getActivity()).passUserInput((byte) 3, input.getText().toString().getBytes());
+        ((MainActivity)getActivity()).passUserInput((byte) 4, input.getText().toString().getBytes());
+        input.setText("");
     }
 }
