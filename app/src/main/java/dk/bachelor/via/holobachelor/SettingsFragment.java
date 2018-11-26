@@ -1,6 +1,6 @@
 package dk.bachelor.via.holobachelor;
 
-import android.media.Image;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,18 +11,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-import java.nio.charset.StandardCharsets;
-
-import Broadcaster.Broadcaster;
-
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view;
+        int orientation = getResources().getConfiguration().orientation;
+        Log.d("orientationSettings", Integer.toString(orientation));
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
+            view = inflater.inflate(R.layout.settings_fragment_land, container, false);
+        } else {
+            // In portrait
+            view = inflater.inflate(R.layout.settings_fragment, container, false);
+        }
 
 
-        View view = inflater.inflate(R.layout.settings_fragment, container, false);
         Button minusButton = view.findViewById(R.id.minus);
         minusButton.setOnClickListener(this);
         Button plusButton = view.findViewById(R.id.plus);
