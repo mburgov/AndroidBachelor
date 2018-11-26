@@ -1,5 +1,6 @@
 package dk.bachelor.via.holobachelor;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,8 +17,16 @@ public class InputFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-
-        View view = inflater.inflate(R.layout.input_fragment, container, false);
+        View view;
+        int orientation = getResources().getConfiguration().orientation;
+        Log.d("orientationInput", Integer.toString(orientation));
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
+            view = inflater.inflate(R.layout.input_fragment_land, container, false);
+        } else {
+            // In portrait
+            view = inflater.inflate(R.layout.input_fragment, container, false);
+        }
         Button button = view.findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener()
         {
