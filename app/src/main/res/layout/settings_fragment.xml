@@ -34,13 +34,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageButton
+            <Button
                 android:id="@+id/minus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingRight="50dp" />
 
-            <ImageButton
+            <Button
                 android:id="@+id/plus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

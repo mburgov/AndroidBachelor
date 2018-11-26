@@ -23,14 +23,15 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
 
         View view = inflater.inflate(R.layout.settings_fragment, container, false);
-        ImageButton minusButton = view.findViewById(R.id.minus);
+        Button minusButton = view.findViewById(R.id.minus);
         minusButton.setOnClickListener(this);
-        ImageButton plusButton = view.findViewById(R.id.plus);
+        Button plusButton = view.findViewById(R.id.plus);
         plusButton.setOnClickListener(this);
         return view;
     }
 
     private void MapSize(byte data){
+        Log.d("MapSize", "Rescaled");
         ((MainActivity)getActivity()).passUserInput((byte) 5, new byte[]{data});
     }
 

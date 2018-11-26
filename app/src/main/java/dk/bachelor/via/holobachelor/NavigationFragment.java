@@ -64,14 +64,14 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
             } else if (motionEvent.getAction() == android.view.MotionEvent.ACTION_UP) {
                 Log.d("TouchTest", "Touch up");
                 // Log.d("RotationGestureDetector", "Rotation: " + Float.toString(angle));
-                // payload: 1 for positive, 0 for negative rotation
+                // payload: 1 for positive, 2 for negative rotation
                 // positive rotation is counter clockwise
                 if(angle > 25) {
                     ((MainActivity)getActivity()).passUserInput((byte) 3, new byte[]{1});
                     Log.d("RotationGestureDetector", "Positive Rotation");
                 }
                 else if(angle < -25) {
-                    ((MainActivity)getActivity()).passUserInput((byte) 3, new byte[]{0});
+                    ((MainActivity)getActivity()).passUserInput((byte) 3, new byte[]{2});
                     Log.d("RotationGestureDetector", "Negative Rotation");
                 }
             }
@@ -110,7 +110,7 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
                 Log.d("Scale", "Zoomed in");
             } else if (mScaleFactor < originalValue && Math.abs(angle) < 25){
                 // 0 for zoom out
-                ((MainActivity)getActivity()).passUserInput((byte) 2, new byte[]{0});
+                ((MainActivity)getActivity()).passUserInput((byte) 2, new byte[]{2});
                 Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
                 Log.d("Scale", "Zoomed out");
             }
@@ -137,6 +137,7 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             Log.i("TAG", "onSingleTapConfirmed: ");
+            ((MainActivity)getActivity()).passUserInput((byte) 6, new byte[]{1});
             return true;
         }
         @Override

@@ -74,9 +74,12 @@ public class MainActivity extends AppCompatActivity{
         mBManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         if (mBManager != null) {
             mBAdapter = mBManager.getAdapter();
+            if (mBAdapter != null) {
+                mBLEAdvertiser = mBAdapter.getBluetoothLeAdvertiser();
+                broadcaster = Broadcaster.getInstance(mBManager, mBAdapter, mBLEAdvertiser);
+            }
         }
-        mBLEAdvertiser = mBAdapter.getBluetoothLeAdvertiser();
-        broadcaster = Broadcaster.getInstance(mBManager, mBAdapter, mBLEAdvertiser);
+
 
     }
 
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "No LE support on this device", Toast.LENGTH_SHORT).show();
             finish();
         }
-        if (!mBAdapter.isMultipleAdvertisementSupported()) {
+        if (mBAdapter != null && !mBAdapter.isMultipleAdvertisementSupported()) {
             Toast.makeText(this, "No advertising support on this device", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -101,22 +104,25 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onPause() {
         super.onPause();
-        broadcaster.stopAdvertising();
+        if(broadcaster != null)
+            broadcaster.stopAdvertising();
     }
 
     public void panMap(View view){
         /* first argument is the movement type
         second is the direction of panning, going CSS style
         1 - North
-        2 - East
-        3 - South
+        2 - South
+        3 - East
         4 - West
          */
         byte[] data = {Byte.parseByte(view.getTag().toString())};
+        if(broadcaster != null)
         broadcaster.createPacketWithData((byte) 1, data);
     }
 
     public void passUserInput(byte type, byte[] info){
+        if(broadcaster != null)
         broadcaster.createPacketWithData(type, info);
     }
 }

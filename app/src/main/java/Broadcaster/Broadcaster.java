@@ -6,10 +6,12 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import static java.lang.Thread.sleep;
@@ -17,11 +19,16 @@ import static java.lang.Thread.sleep;
 public class Broadcaster {
 
     private static Broadcaster INSTANCE = null;
+    static final int BEACON_ID = 1775;
     BluetoothAdapter mBAdapter;
     BluetoothManager mBManager;
     BluetoothLeAdvertiser mBLEAdvertiser;
-    static final int BEACON_ID = 1775;
-    AdvertiseData data;
+    static AdvertiseData data;
+
+    public static AdvertiseData getData() {
+        return data;
+    }
+
 
     private Broadcaster(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser){
         this.mBManager = manager;
@@ -39,6 +46,7 @@ public class Broadcaster {
     }
 
     private void startAdvertising() {
+        Log.d("Mock", data.toString());
         if (mBLEAdvertiser == null) return;
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
                 .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
@@ -57,7 +65,7 @@ public class Broadcaster {
     public void stopAdvertising() {
         if (mBLEAdvertiser == null) return;
         mBLEAdvertiser.stopAdvertising(mAdvertiseCallback);
-        String msg = "Service Stopped";
+        Log.d("Stopped", "Asd");
     }
 
     private void restartAdvertising() {
@@ -70,6 +78,7 @@ public class Broadcaster {
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             super.onStartSuccess(settingsInEffect);
             String msg = "Service Running";
+            Log.d("Stopped", msg);
             mHandler.sendMessage(Message.obtain(null, 0, msg));
         }
 
@@ -106,6 +115,8 @@ UI feedback to the user would go here.
     // 2 - Zooming
     // 3 - Rotating
     // 4 - Text input
+    // 5 - Scaling
+    // 6 - Tap
     public void createPacketWithData(byte id, byte[] payload) {
         data = new AdvertiseData.Builder()
                 .addManufacturerData(BEACON_ID, buildBLEPacket(id, payload))
