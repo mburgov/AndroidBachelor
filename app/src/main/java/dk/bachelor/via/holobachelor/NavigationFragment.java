@@ -31,13 +31,7 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
         View view;
         int orientation = getResources().getConfiguration().orientation;
         Log.d("orientationNavigation", Integer.toString(orientation));
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // In landscape
-            view = inflater.inflate(R.layout.navigation_fragment_land, container, false);
-        } else {
-            // In portrait
-            view = inflater.inflate(R.layout.navigation_fragment, container, false);
-        }
+        view = inflater.inflate(R.layout.navigation_fragment, container, false);
         // this is the view we will add the gesture detector to
         View myView = view.findViewById(R.id.gesture_view);
         mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());

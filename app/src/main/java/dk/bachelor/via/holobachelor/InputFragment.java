@@ -20,13 +20,7 @@ public class InputFragment extends Fragment {
         View view;
         int orientation = getResources().getConfiguration().orientation;
         Log.d("orientationInput", Integer.toString(orientation));
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // In landscape
-            view = inflater.inflate(R.layout.input_fragment_land, container, false);
-        } else {
-            // In portrait
-            view = inflater.inflate(R.layout.input_fragment, container, false);
-        }
+        view = inflater.inflate(R.layout.input_fragment, container, false);
         Button button = view.findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener()
         {

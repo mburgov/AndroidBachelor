@@ -8,11 +8,16 @@ import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.os.Debug;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+
+import dk.bachelor.via.holobachelor.R;
+import dk.bachelor.via.holobachelor.SettingsFragment;
 
 import static java.lang.Thread.sleep;
 
@@ -24,29 +29,26 @@ public class Broadcaster {
     BluetoothManager mBManager;
     BluetoothLeAdvertiser mBLEAdvertiser;
     static AdvertiseData data;
-
-    public static AdvertiseData getData() {
-        return data;
-    }
+    Handler mainHandler;
 
 
-    private Broadcaster(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser){
+    private Broadcaster(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser, Handler mainHandler){
         this.mBManager = manager;
         this.mBAdapter = mBAdapter;
         this.mBLEAdvertiser = mBLEAdvertiser;
+        this.mainHandler = mainHandler;
     }
 
-    public static Broadcaster getInstance(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser) {
+    public static Broadcaster getInstance(BluetoothManager manager, BluetoothAdapter mBAdapter, BluetoothLeAdvertiser mBLEAdvertiser, Handler mainHandler) {
 
         if(INSTANCE == null){
-            INSTANCE = new Broadcaster(manager, mBAdapter, mBLEAdvertiser);
+            INSTANCE = new Broadcaster(manager, mBAdapter, mBLEAdvertiser, mainHandler);
         }
         return INSTANCE;
 
     }
 
     private void startAdvertising() {
-        Log.d("Mock", data.toString());
         if (mBLEAdvertiser == null) return;
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
                 .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
@@ -65,12 +67,16 @@ public class Broadcaster {
     public void stopAdvertising() {
         if (mBLEAdvertiser == null) return;
         mBLEAdvertiser.stopAdvertising(mAdvertiseCallback);
-        Log.d("Stopped", "Asd");
+        mainHandler.sendMessage(Message.obtain(null, 0, new Message()));
     }
 
     private void restartAdvertising() {
         stopAdvertising();
         startAdvertising();
+    }
+
+    public static AdvertiseData getData() {
+        return data;
     }
 
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
@@ -79,26 +85,17 @@ public class Broadcaster {
             super.onStartSuccess(settingsInEffect);
             String msg = "Service Running";
             Log.d("Stopped", msg);
-            mHandler.sendMessage(Message.obtain(null, 0, msg));
+            mainHandler.sendMessage(Message.obtain(null, 1, msg));
         }
 
         @Override
         public void onStartFailure(int errorCode) {
             if (errorCode != ADVERTISE_FAILED_ALREADY_STARTED) {
                 String msg = "Service failed to start: " + errorCode;
-                mHandler.sendMessage(Message.obtain(null, 0, msg));
+                mainHandler.sendMessage(Message.obtain(null, 0, msg));
             } else {
                 restartAdvertising();
             }
-        }
-    };
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-/*
-UI feedback to the user would go here.
-*/
         }
     };
 

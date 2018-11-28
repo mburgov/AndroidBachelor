@@ -6,15 +6,21 @@ import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import Broadcaster.Broadcaster;
 
@@ -26,6 +32,9 @@ public class MainActivity extends AppCompatActivity{
     BluetoothLeAdvertiser mBLEAdvertiser;
     AdvertiseData data;
     public static Broadcaster broadcaster;
+    public static Handler mainThreadHandler;
+
+    String status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,28 +42,30 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        status = "";
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                                                           @Override
-                                                           public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                                                               Fragment selectedFragment = null;
-                                                               switch (item.getItemId()){
-                                                                   case R.id.navigation_navigation:
-                                                                       selectedFragment = new NavigationFragment();
-                                                                       break;
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment selectedFragment = null;
+                switch (item.getItemId()) {
+                    case R.id.navigation_navigation:
+                        selectedFragment = new NavigationFragment();
+                        break;
 
-                                                                   case R.id.navigation_settings:
-                                                                       selectedFragment = new SettingsFragment();
-                                                                       break;
+                    case R.id.navigation_settings:
+                        selectedFragment = new SettingsFragment();
+                        break;
 
-                                                                   case R.id.navigation_input:
-                                                                       selectedFragment = new InputFragment();
-                                                                       break;
-                                                               }
-                                                               getSupportFragmentManager().beginTransaction().replace(R.id.frame, selectedFragment).commit();
+                    case R.id.navigation_input:
+                        selectedFragment = new InputFragment();
+                        break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.frame, selectedFragment).commit();
 
-                                                               return true;
-                                                           }
+                return true;
+            }
         });
 
         getSupportFragmentManager().beginTransaction().replace(R.id.frame, new NavigationFragment()).commit();
@@ -71,14 +82,29 @@ public class MainActivity extends AppCompatActivity{
         // Add a touch listener to the view
         // The touch listener passes all its events on to the gesture detector
 
+        mainThreadHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == 1) {
+                    status = "Broadcasting";
+                    Log.d("BLEStatus", status);
+                } else if (msg.what == 0) {
+                    status = "Not Broadcasting";
+                    Log.d("BLEStatus", status);
+                }
+            }
+
+        };
+
         mBManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         if (mBManager != null) {
             mBAdapter = mBManager.getAdapter();
             if (mBAdapter != null) {
                 mBLEAdvertiser = mBAdapter.getBluetoothLeAdvertiser();
-                broadcaster = Broadcaster.getInstance(mBManager, mBAdapter, mBLEAdvertiser);
+                broadcaster = Broadcaster.getInstance(mBManager, mBAdapter, mBLEAdvertiser, mainThreadHandler);
             }
         }
+
 
 
     }
@@ -118,11 +144,15 @@ public class MainActivity extends AppCompatActivity{
          */
         byte[] data = {Byte.parseByte(view.getTag().toString())};
         if(broadcaster != null)
-        broadcaster.createPacketWithData((byte) 1, data);
+            passUserInput((byte) 1, data);
     }
 
     public void passUserInput(byte type, byte[] info){
         if(broadcaster != null)
-        broadcaster.createPacketWithData(type, info);
+            broadcaster.createPacketWithData(type, info);
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

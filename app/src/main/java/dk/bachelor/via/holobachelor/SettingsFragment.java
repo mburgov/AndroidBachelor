@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
@@ -23,6 +24,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private Editor editor;
     private Button minusButton;
     private Button plusButton;
+    TextView status;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -30,13 +33,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         Log.d("settingsFragment","called");
         int orientation = getResources().getConfiguration().orientation;
         Log.d("orientationSettings", Integer.toString(orientation));
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // In landscape
-            view = inflater.inflate(R.layout.settings_fragment_land, container, false);
-        } else {
-            // In portrait
-            view = inflater.inflate(R.layout.settings_fragment, container, false);
-        }
+        view = inflater.inflate(R.layout.settings_fragment, container, false);
         activity = getActivity();
         Log.d("activityMain",activity.toString());
         SharedPreferences pref = activity.getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
@@ -47,6 +44,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         minusButton.setOnClickListener(this);
         plusButton = view.findViewById(R.id.plus);
         plusButton.setOnClickListener(this);
+        status = view.findViewById(R.id.textView5);
+        status.setText(((MainActivity)getActivity()).getStatus());
         return view;
     }
 
@@ -66,6 +65,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             checkBox.setChecked(false); //it was NOT checked
         }
         checkBoxClicked();
+        status.setText(((MainActivity)getActivity()).getStatus());
     }
     private void checkBoxClicked(){
         Log.d("checkbox state",String.valueOf(checkBox.isChecked()));
