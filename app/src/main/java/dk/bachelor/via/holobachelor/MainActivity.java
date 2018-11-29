@@ -7,13 +7,12 @@ import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-
-
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -22,32 +21,30 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import Broadcaster.Broadcaster;
 
-
 public class MainActivity extends AppCompatActivity {
-    BluetoothAdapter mBAdapter;
-    BluetoothManager mBManager;
-    BluetoothLeAdvertiser mBLEAdvertiser;
-    AdvertiseData data;
-    public static Broadcaster broadcaster;
-    public static Handler mainThreadHandler;
+    private BluetoothAdapter mBAdapter;
+    private BluetoothManager mBManager;
+    private BluetoothLeAdvertiser mBLEAdvertiser;
+    private static Broadcaster broadcaster;
+    private static Handler mainThreadHandler;
     private Editor editor;
-    String status;
-    SharedPreferences pref;
+    private String status;
+    private SharedPreferences pref;
+    private BottomNavigationView navigation;
 
-    // executed only on startup
+    // executed only on startup(Not on orientation change)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pref = getApplicationContext().getSharedPreferences("Pref", 0); // 0 - for private mode
+        pref = getApplicationContext().getSharedPreferences("PrefNavBar", 0); // 0 - for private mode
         editor = pref.edit();
-        executeLogic();
+        navBarHandler();
+        orientationFragmentHandler();
+        bluetoothHandler();
     }
 
     @Override
@@ -60,12 +57,14 @@ public class MainActivity extends AppCompatActivity {
     // executed on orientation change
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        executeLogic();
+        navBarHandler();
+        orientationFragmentHandler();
+        bluetoothHandler();
     }
 
-    public void executeLogic() {
+    public void navBarHandler() {
         setContentView(R.layout.activity_main);
-        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -94,9 +93,12 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        if (pref.getString("selectedFragment", "defaultValue").equals("Navigation") || pref.getString("selectedFragment", "defaultValue").equals("defaultValue")) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame, new NavigationFragment()).commit();
+    }
 
+    private void orientationFragmentHandler() {
+        if (pref.getString("selectedFragment", "defaultValue").equals("Navigation")
+                || pref.getString("selectedFragment", "defaultValue").equals("defaultValue")) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame, new NavigationFragment()).commit();
             navigation.getMenu().findItem(R.id.navigation_navigation).setChecked(true);
 
             Menu menu = navigation.getMenu();
@@ -104,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
             menuItem.setChecked(true);
         } else if (pref.getString("selectedFragment", "defaultValue").equals("Settings")) {
             getSupportFragmentManager().beginTransaction().replace(R.id.frame, new SettingsFragment()).commit();
-
             navigation.getMenu().findItem(R.id.navigation_settings).setChecked(true);
 
             Menu menu = navigation.getMenu();
@@ -112,13 +113,41 @@ public class MainActivity extends AppCompatActivity {
             menuItem.setChecked(true);
         } else {
             getSupportFragmentManager().beginTransaction().replace(R.id.frame, new InputFragment()).commit();
-
             navigation.getMenu().findItem(R.id.navigation_input).setChecked(true);
 
             Menu menu = navigation.getMenu();
             MenuItem menuItem = menu.getItem(0);
             menuItem.setChecked(true);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        orientationLock();
+        if (mBAdapter == null || !mBAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(enableBtIntent);
+            finish();
+        }
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, "No LE support on this device", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        if (mBAdapter != null && !mBAdapter.isMultipleAdvertisementSupported()) {
+            Toast.makeText(this, "No advertising support on this device", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (broadcaster != null)
+            broadcaster.stopAdvertising();
+    }
+
+    private void bluetoothHandler() {
         mainThreadHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -143,29 +172,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mBAdapter == null || !mBAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBtIntent);
-            finish();
-        }
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "No LE support on this device", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        if (mBAdapter != null && !mBAdapter.isMultipleAdvertisementSupported()) {
-            Toast.makeText(this, "No advertising support on this device", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (broadcaster != null)
-            broadcaster.stopAdvertising();
+    private void orientationLock() {
+        SharedPreferences prefCheckbox = getApplicationContext().getSharedPreferences("CheckBoxPref", 0);
+        if (prefCheckbox.getBoolean("checkbox", false) == true) {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        } else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     public void panMap(View view) {

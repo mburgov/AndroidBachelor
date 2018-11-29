@@ -24,83 +24,80 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private Editor editor;
     private Button minusButton;
     private Button plusButton;
-    TextView status;
+    private TextView status;
+    private SharedPreferences pref;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        Log.d("settingsFragment","called");
-        int orientation = getResources().getConfiguration().orientation;
-        Log.d("orientationSettings", Integer.toString(orientation));
         view = inflater.inflate(R.layout.settings_fragment, container, false);
         activity = getActivity();
-        Log.d("activityMain",activity.toString());
-        SharedPreferences pref = activity.getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        pref = activity.getApplicationContext().getSharedPreferences("CheckBoxPref", 0); // 0 - for private mode
         editor = pref.edit();
-        checkBox= view.findViewById(R.id.checkBox);
+        checkBox = view.findViewById(R.id.checkBox);
         checkBox.setOnClickListener(this);
         minusButton = view.findViewById(R.id.minus);
         minusButton.setOnClickListener(this);
         plusButton = view.findViewById(R.id.plus);
         plusButton.setOnClickListener(this);
         status = view.findViewById(R.id.textView5);
-        status.setText(((MainActivity)getActivity()).getStatus());
+        status.setText(((MainActivity) getActivity()).getStatus());
         return view;
     }
 
-    private void MapSize(byte data){
+    private void MapSize(byte data) {
         Log.d("MapSize", "Rescaled");
-        ((MainActivity)getActivity()).passUserInput((byte) 5, new byte[]{data});
+        ((MainActivity) getActivity()).passUserInput((byte) 5, new byte[]{data});
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        SharedPreferences pref = activity.getApplicationContext().getSharedPreferences("MyPref", 0);
-        Log.d("preferences checkbox",String.valueOf(pref.getBoolean("checkbox", false)));
-        if (pref.getBoolean("checkbox", false) == true){ //false is default value
+        if (pref.getBoolean("checkbox", false) == true) { //false is default value
             checkBox.setChecked(true); //it was checked
-        } else{
+        } else {
             checkBox.setChecked(false); //it was NOT checked
         }
         checkBoxClicked();
-        status.setText(((MainActivity)getActivity()).getStatus());
+        status.setText(((MainActivity) getActivity()).getStatus());
     }
-    private void checkBoxClicked(){
-        Log.d("checkbox state",String.valueOf(checkBox.isChecked()));
-        if(checkBox.isChecked()) {
+
+    public void checkBoxClicked() {
+        Log.d("checkbox state", String.valueOf(checkBox.isChecked()));
+        if (checkBox.isChecked()) {
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            } else activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
-        else activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            } else {
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        } else activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
+
     @Override
     public void onClick(View view) {
-    switch(view.getId()){
-        case R.id.minus:
-            MapSize((byte) 1);
-            break;
-        case R.id.plus:
-            MapSize((byte) 2);
-            break;
-        case R.id.checkBox:
-            if(checkBox.isChecked()) {
-                Log.d("checkbox checked","checked");
-                editor.putBoolean("checkbox", true);
-                editor.commit(); // commit changes
-                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                } else activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            }
-            else {
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-                editor.putBoolean("checkbox", false);
-                editor.commit(); // commit changes
-            }
-        default:
-            break;
-    }
+        switch (view.getId()) {
+            case R.id.minus:
+                MapSize((byte) 1);
+                break;
+            case R.id.plus:
+                MapSize((byte) 2);
+                break;
+            case R.id.checkBox:
+                if (checkBox.isChecked()) {
+                    editor.putBoolean("checkbox", true);
+                    editor.commit(); // commit changes
+                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    } else
+                        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                } else {
+                    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                    editor.putBoolean("checkbox", false);
+                    editor.commit(); // commit changes
+                }
+            default:
+                break;
+        }
     }
 }
