@@ -20,18 +20,13 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
     private ScaleGestureDetector mScaleGestureDetector;
     private RotationGestureDetector mRotationDetector;
     private float mScaleFactor = 1.0f;
-    private boolean screenIsTouched = false;
     private float angle = 0.0f;
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view;
-        int orientation = getResources().getConfiguration().orientation;
-        Log.d("orientationNavigation", Integer.toString(orientation));
-        view = inflater.inflate(R.layout.navigation_fragment, container, false);
+        View view = inflater.inflate(R.layout.navigation_fragment, container, false);
         // this is the view we will add the gesture detector to
         View myView = view.findViewById(R.id.gesture_view);
         mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
@@ -57,10 +52,8 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
             // recognize the event
             if (motionEvent.getAction() == android.view.MotionEvent.ACTION_DOWN) {
                 Log.d("TouchTest", "Touch down");
-                screenIsTouched = true;
             } else if (motionEvent.getAction() == android.view.MotionEvent.ACTION_UP) {
                 Log.d("TouchTest", "Touch up");
-                // Log.d("RotationGestureDetector", "Rotation: " + Float.toString(angle));
                 // payload: 1 for positive, 2 for negative rotation
                 // positive rotation is counter clockwise
                 if(angle > 25) {

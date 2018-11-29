@@ -20,7 +20,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     private Activity activity;
     private CheckBox checkBox;
-    private View view;
     private Editor editor;
     private Button minusButton;
     private Button plusButton;
@@ -31,7 +30,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.settings_fragment, container, false);
+        View view = inflater.inflate(R.layout.settings_fragment, container, false);
         activity = getActivity();
         pref = activity.getApplicationContext().getSharedPreferences("CheckBoxPref", 0); // 0 - for private mode
         editor = pref.edit();
