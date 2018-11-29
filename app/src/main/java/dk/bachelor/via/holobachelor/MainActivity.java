@@ -64,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void navBarHandler() {
         setContentView(R.layout.activity_main);
+
+
+        status = "Not Broadcasting";
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override

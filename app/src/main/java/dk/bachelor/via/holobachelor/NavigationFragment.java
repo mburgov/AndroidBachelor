@@ -19,8 +19,9 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
     private GestureDetector mDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotationGestureDetector mRotationDetector;
-    private float mScaleFactor = 1.0f;
-    private float angle = 0.0f;
+    public float mScaleFactor = 1.0f;
+    public float angle = 0.0f;
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener;
 
     @Nullable
     @Override
@@ -29,7 +30,7 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
         View view = inflater.inflate(R.layout.navigation_fragment, container, false);
         // this is the view we will add the gesture detector to
         View myView = view.findViewById(R.id.gesture_view);
-        mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
+        mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener(this));
         mRotationDetector = new RotationGestureDetector(this);
         // get the gesture detector
         mDetector = new GestureDetector(getActivity(), new MyGestureListener());
@@ -70,43 +71,7 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
         }
     };
 
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
-        private float originalValue = 128;
-
-        @Override
-        public boolean onScale(ScaleGestureDetector scaleGestureDetector){
-            mScaleFactor *= scaleGestureDetector.getScaleFactor();
-            mScaleFactor = Math.max(1.0f,
-                    Math.min(mScaleFactor, 256.0f));
-            Log.d("TAG", "Scale factor: " + Float.toString(mScaleFactor));
-            return true;
-        }
-
-        @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector){
-            Log.d("Scale", "It started");
-            mScaleFactor = originalValue;
-            return true;
-        }
-
-        @Override
-        public void onScaleEnd (ScaleGestureDetector detector){
-
-            if(mScaleFactor > originalValue && Math.abs(angle) < 25) {
-                // 1 for zoom in
-                ((MainActivity)getActivity()).passUserInput((byte) 2, new byte[]{1});
-                Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
-                Log.d("Scale", "Zoomed in");
-            } else if (mScaleFactor < originalValue && Math.abs(angle) < 25){
-                // 0 for zoom out
-                ((MainActivity)getActivity()).passUserInput((byte) 2, new byte[]{2});
-                Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
-                Log.d("Scale", "Zoomed out");
-            }
-            Log.d("Scale", "It ended");
-        }
-    }
 
 
     @Override
