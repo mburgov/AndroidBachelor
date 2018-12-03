@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
+
 import Broadcaster.Broadcaster;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void navBarHandler() {
         setContentView(R.layout.activity_main);
-
-
         status = "Not Broadcasting";
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -186,18 +185,6 @@ public class MainActivity extends AppCompatActivity {
         } else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
-    public void panMap(View view) {
-        /* first argument is the movement type
-        second is the direction of panning, going CSS style
-        1 - North
-        2 - South
-        3 - East
-        4 - West
-         */
-        byte[] data = {Byte.parseByte(view.getTag().toString())};
-        if (broadcaster != null)
-            passUserInput((byte) 1, data);
-    }
 
     public void passUserInput(byte type, byte[] info) {
         if (broadcaster != null)

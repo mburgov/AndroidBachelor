@@ -1,6 +1,5 @@
 package dk.bachelor.via.holobachelor;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.ScaleGestureDetector;
 
