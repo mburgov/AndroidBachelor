@@ -45,7 +45,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-    private void MapSize(byte data) {
+    private void changeMapSize(byte data) {
         Log.d("MapSize", "Rescaled");
         ((MainActivity) getActivity()).passUserInput((byte) 5, new byte[]{data});
     }
@@ -77,10 +77,10 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.minus:
-                MapSize((byte) 1);
+                changeMapSize((byte) 1);
                 break;
             case R.id.plus:
-                MapSize((byte) 2);
+                changeMapSize((byte) 2);
                 break;
             case R.id.checkBox:
                 if (checkBox.isChecked()) {
