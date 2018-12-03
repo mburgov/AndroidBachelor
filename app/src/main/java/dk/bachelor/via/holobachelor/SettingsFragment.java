@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -41,7 +42,13 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         plusButton = view.findViewById(R.id.plus);
         plusButton.setOnClickListener(this);
         status = view.findViewById(R.id.textView5);
-        status.setText(((MainActivity) getActivity()).getStatus());
+        status.setText(((MainActivity)getActivity()).getStatus());
+        Log.d("UIStatusCreate",((MainActivity)getActivity()).getStatus());
+        if(status.getText().toString().contains("Not")){
+            status.setTextColor(Color.parseColor("#FF0000"));
+        } else {
+            status.setTextColor(Color.parseColor("#00FF00"));
+        }
         return view;
     }
 
@@ -59,7 +66,14 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             checkBox.setChecked(false); //it was NOT checked
         }
         checkBoxClicked();
-        status.setText(((MainActivity) getActivity()).getStatus());
+        status = ((MainActivity)getActivity()).findViewById(R.id.textView5);
+        status.setText(((MainActivity)getActivity()).getStatus());
+        Log.d("UIStatusResume",((MainActivity)getActivity()).getStatus());
+        if(status.getText().toString().contains("Not")){
+            status.setTextColor(Color.parseColor("#FF0000"));
+        } else {
+            status.setTextColor(Color.parseColor("#00FF00"));
+        }
     }
 
     public void checkBoxClicked() {
@@ -72,7 +86,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         } else activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
