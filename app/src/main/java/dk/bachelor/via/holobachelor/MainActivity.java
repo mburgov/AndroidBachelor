@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothHandler();
     }
 
-    public void navBarHandler() {
+    private void navBarHandler() {
         setContentView(R.layout.activity_main);
         status = "Not Broadcasting";
         navigation = findViewById(R.id.navigation);

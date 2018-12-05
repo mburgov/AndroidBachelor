@@ -6,7 +6,7 @@ import android.view.ScaleGestureDetector;
 public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
     private float originalValue = 128;
-    public float mScaleFactor;
+    private float mScaleFactor;
     private NavigationFragment navigationFragment;
 
     public ScaleListener(NavigationFragment navigationFragment){
