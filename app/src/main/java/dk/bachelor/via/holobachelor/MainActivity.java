@@ -2,7 +2,6 @@ package dk.bachelor.via.holobachelor;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
@@ -21,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import Broadcaster.Broadcaster;
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         pref = getApplicationContext().getSharedPreferences("PrefNavBar", 0); // 0 - for private mode
         editor = pref.edit();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         navBarHandler();
         orientationFragmentHandler();
         bluetoothHandler();
@@ -62,10 +63,8 @@ public class MainActivity extends AppCompatActivity {
         bluetoothHandler();
     }
 
-    public void navBarHandler() {
+    private void navBarHandler() {
         setContentView(R.layout.activity_main);
-
-
         status = "Not Broadcasting";
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -186,18 +185,6 @@ public class MainActivity extends AppCompatActivity {
         } else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
-    public void panMap(View view) {
-        /* first argument is the movement type
-        second is the direction of panning, going CSS style
-        1 - North
-        2 - South
-        3 - East
-        4 - West
-         */
-        byte[] data = {Byte.parseByte(view.getTag().toString())};
-        if (broadcaster != null)
-            passUserInput((byte) 1, data);
-    }
 
     public void passUserInput(byte type, byte[] info) {
         if (broadcaster != null)

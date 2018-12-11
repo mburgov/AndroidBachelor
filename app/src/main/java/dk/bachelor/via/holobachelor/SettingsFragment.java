@@ -52,7 +52,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-    private void MapSize(byte data) {
+    private void changeMapSize(byte data) {
         Log.d("MapSize", "Rescaled");
         ((MainActivity) getActivity()).passUserInput((byte) 5, new byte[]{data});
     }
@@ -65,7 +65,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         } else {
             checkBox.setChecked(false); //it was NOT checked
         }
-        checkBoxClicked();
         status = ((MainActivity)getActivity()).findViewById(R.id.textView5);
         status.setText(((MainActivity)getActivity()).getStatus());
         Log.d("UIStatusResume",((MainActivity)getActivity()).getStatus());
@@ -76,24 +75,14 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void checkBoxClicked() {
-        Log.d("checkbox state", String.valueOf(checkBox.isChecked()));
-        if (checkBox.isChecked()) {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            } else {
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            }
-        } else activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-    }
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.minus:
-                MapSize((byte) 1);
+                changeMapSize((byte) 1);
                 break;
             case R.id.plus:
-                MapSize((byte) 2);
+                changeMapSize((byte) 2);
                 break;
             case R.id.checkBox:
                 if (checkBox.isChecked()) {
