@@ -45,7 +45,8 @@ public class BluetoothPackageTest {
         onView(withId(R.id.gesture_view)).check(matches(isDisplayed()));
         onView(withId(R.id.button2)).perform(click());
         waitFor(1);
-        assertEquals(Broadcaster.getInstance(null, null, null, null).getData()
+        assertEquals(Broadcaster.getInstance(null, null,
+                null, null).getData()
                 .getManufacturerSpecificData().get(1775)[0], (byte) 1);
     }
 
@@ -121,7 +122,7 @@ public class BluetoothPackageTest {
     }
 
 
-    // custom multi gesture for zooming
+    // custom multi gesture for zooming/rotation
     public static ViewAction pinchOut() {
         return new ViewAction() {
             @Override

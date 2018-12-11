@@ -2,7 +2,7 @@ package dk.bachelor.via.holobachelor;
 
 import android.view.MotionEvent;
 
-public class RotationGestureDetector {
+public class RotationListener {
     private static final int INVALID_POINTER_ID = -1;
     private float fX, fY, sX, sY;
     private int ptrID1, ptrID2;
@@ -14,7 +14,7 @@ public class RotationGestureDetector {
         return mAngle;
     }
 
-    public RotationGestureDetector(onRotationGestureListener listener){
+    public RotationListener(onRotationGestureListener listener){
         mListener = listener;
         ptrID1 = INVALID_POINTER_ID;
         ptrID2 = INVALID_POINTER_ID;
@@ -73,6 +73,6 @@ public class RotationGestureDetector {
     }
 
     public interface onRotationGestureListener {
-        void onRotation(RotationGestureDetector rotationDetector);
+        void onRotation(RotationListener rotationDetector);
     }
 }

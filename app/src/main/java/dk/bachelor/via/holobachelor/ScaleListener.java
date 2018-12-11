@@ -39,7 +39,7 @@ public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureList
             Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
             Log.d("Scale", "Zoomed in");
         } else if (mScaleFactor < originalValue && Math.abs(navigationFragment.angle) < 25){
-            // 0 for zoom out
+            // 2 for zoom out
             ((MainActivity)navigationFragment.getActivity()).passUserInput((byte) 2, new byte[]{2});
             Log.d("Scale", "Scale factor: " + Float.toString(mScaleFactor));
             Log.d("Scale", "Zoomed out");

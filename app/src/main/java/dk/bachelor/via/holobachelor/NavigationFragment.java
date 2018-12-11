@@ -1,6 +1,5 @@
 package dk.bachelor.via.holobachelor;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -14,11 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class NavigationFragment extends Fragment implements RotationGestureDetector.onRotationGestureListener  {
+public class NavigationFragment extends Fragment implements RotationListener.onRotationGestureListener  {
 
     private GestureDetector mDetector;
     private ScaleGestureDetector mScaleGestureDetector;
-    private RotationGestureDetector mRotationDetector;
+    private RotationListener mRotationDetector;
     public float mScaleFactor = 1.0f;
     public float angle = 0.0f;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener;
@@ -31,7 +30,7 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
         // this is the view we will add the gesture detector to
         View myView = view.findViewById(R.id.gesture_view);
         mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener(this));
-        mRotationDetector = new RotationGestureDetector(this);
+        mRotationDetector = new RotationListener(this);
         // get the gesture detector
         mDetector = new GestureDetector(getActivity(), new MyGestureListener());
 
@@ -59,11 +58,11 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
                 // positive rotation is counter clockwise
                 if(angle > 25) {
                     ((MainActivity)getActivity()).passUserInput((byte) 3, new byte[]{1});
-                    Log.d("RotationGestureDetector", "Positive Rotation");
+                    Log.d("RotationListener", "Positive Rotation");
                 }
                 else if(angle < -25) {
                     ((MainActivity)getActivity()).passUserInput((byte) 3, new byte[]{2});
-                    Log.d("RotationGestureDetector", "Negative Rotation");
+                    Log.d("RotationListener", "Negative Rotation");
                 }
             }
             return mDetector.onTouchEvent(motionEvent);
@@ -75,9 +74,9 @@ public class NavigationFragment extends Fragment implements RotationGestureDetec
 
 
     @Override
-    public void onRotation(RotationGestureDetector rotationDetector) {
+    public void onRotation(RotationListener rotationDetector) {
         angle = rotationDetector.getAngle();
-        Log.d("RotationGestureDetector", "Rotation: " + Float.toString(angle));
+        Log.d("RotationListener", "Rotation: " + Float.toString(angle));
     }
 
 
